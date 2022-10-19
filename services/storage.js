@@ -11,7 +11,7 @@
 //-add new entry
 //-*get matching entries by search criteria
 
-
+const Cube = require('../models/Cube');
 const fs = require('fs/promises');
 const uniqid = require('uniqid');
 let data = {};
@@ -67,13 +67,9 @@ async function getById(id) {
 }
 
 async function create(cube) {
-   const id = uniqid();
- 
-    data[id] = cube;
 
-  await persist();
-
-
+    const record = new Cube(cube);
+    return record.save();
 
 }
 

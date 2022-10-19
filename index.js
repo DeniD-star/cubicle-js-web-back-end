@@ -6,6 +6,7 @@
 
 
 const express = require('express');
+const databaseConfig = require('./config/database');
 const expressConfig = require('./config/express');
 const routesConfig = require('./config/routes');
 
@@ -18,6 +19,7 @@ const port = 3000;
 const app = express();
 
 expressConfig(app);
+await databaseConfig(app)
 app.use(await storage());//moddleware se zaka4a predi routovete
 routesConfig(app);
 
