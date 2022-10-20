@@ -7,4 +7,4 @@ const schema = new Schema({
     difficultyLevel: Number
 })
 
-module.export = model('Cube', schema)
+module.exports = model('Cube', schema)
