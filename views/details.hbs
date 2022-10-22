@@ -7,5 +7,17 @@
         <a class="btn" href="/">Back</a>
         <a class="btn" href="/edit/{{_id}}">Edit</a>
       </div>
+      <div class="details">
+        <form action="/comments/{{_id}}/create" method="POST">
+        <span>Your name:</span><input type="text" name="author"><br>
+        <span>Comment: </span><textarea name="content" ></textarea><br>
+        <input type="submit" value="Post Comment">
+        </form>
+        {{#each comments}}
+        {{> comment}}
+        {{else}}
+        <span style="font-style:italic;">No comment yet. Write the first!</span>
+        {{/each}}
+      </div>
   {{/with}}
    

@@ -12,6 +12,7 @@
 //-*get matching entries by search criteria
 
 const Cube = require('../models/Cube');
+const Comment = require('../models/Comment');
 
 
 
@@ -23,7 +24,8 @@ async function init() {
             getAll,
             getById,
             create,
-            edit
+            edit,
+            createComment
         }
 
         next();
@@ -57,7 +59,7 @@ const cubes= Cube.find(options).lean();
 }
 async function getById(id) {
     //tuk ne e nujna validaciq , tui kato ako imame undefined, ve4e samiq controller 6te prenaso4i kum 404
-    const cube = await Cube.findById(id).lean();
+    const cube = await Cube.findById(id).populate('comments').lean();
     if(cube){
         return cube;
     }else{
@@ -84,6 +86,22 @@ async function edit(id, cube){
     return existing.save();
 }
 
+async function createComment(cubeId, comment){
+    const cube = await Cube.findById(cubeId);
+    console.log(cubeId);
+    console.log(cube);
+
+    if(!cube){
+        throw new ReferenceError('No such ID in database!')
+    }
+
+    const newComment = new Comment(comment);
+    await newComment.save();//purvo spasqvame comenatara , za da mojem da polu4im id, koeto ni trqbva
+
+    cube.comments.push(newComment);//posle vkarvame komentara ma masiva ot komentari za tozi kube
+    await cube.save()//nakraq spasqvame kuba s novite komentari
+}
+
 
 
 module.exports={
@@ -91,5 +109,6 @@ module.exports={
     getAll,
     getById,
     create, 
-    edit
+    edit,
+    createComment
 }

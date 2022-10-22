@@ -15,7 +15,7 @@ module.exports = {
        try {
         await req.storage.create(cube);
        } catch (err) {
-          if(err.name === 'ValidationError'){
+          if(err.name == 'ValidationError'){
               return res.render('create', {title: 'Create Cube Page', error: 'All fields are required. Image url must be a valid Url!'})
           }
        }
