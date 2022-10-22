@@ -13,6 +13,7 @@
 
 const Cube = require('../models/Cube');
 const Comment = require('../models/Comment');
+const Accessory = require('../models/Accessory');
 
 
 
@@ -25,7 +26,10 @@ async function init() {
             getById,
             create,
             edit,
-            createComment
+            createComment,
+            createAccessory,
+            getAllAccessories,
+            attachSticker
         }
 
         next();
@@ -59,7 +63,7 @@ const cubes= Cube.find(options).lean();
 }
 async function getById(id) {
     //tuk ne e nujna validaciq , tui kato ako imame undefined, ve4e samiq controller 6te prenaso4i kum 404
-    const cube = await Cube.findById(id).populate('comments').lean();
+    const cube = await Cube.findById(id).populate('comments').populated('accessories').lean();
     if(cube){
         return cube;
     }else{
@@ -102,7 +106,28 @@ async function createComment(cubeId, comment){
     await cube.save()//nakraq spasqvame kuba s novite komentari
 }
 
+async function createAccessory(accessory) {//no mojem da ostavim vse pak asynka tuk, za da razpoznava intelisensa 4e tova vse pak e async funkziq, da razpoznava 4e taq f-q 6te vurne promise
 
+    const record = new Accessory(accessory);
+    return record.save();
+}
+
+async function getAllAccessories(existing){
+    return Accessory.find({_id: {$nin: existing} }).lean();
+}
+
+async function attachSticker(cubeId, stickerId){
+    const cube = await Cube.findById(cubeId);
+    const sticker = await Accessory.findById(stickerId);
+
+    if(!cube || !sticker){
+        throw new ReferenceError('No such ID in database!')
+    }
+
+    cube.accessories.push(sticker);
+    return cube.save();
+
+}
 
 module.exports={
     init,
@@ -110,5 +135,8 @@ module.exports={
     getById,
     create, 
     edit,
-    createComment
+    createComment,
+    createAccessory,
+    getAllAccessories,
+    attachSticker
 }
