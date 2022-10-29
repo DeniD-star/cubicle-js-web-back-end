@@ -1,5 +1,8 @@
 const express = require('express');
 const hbs = require('express-handlebars');
+const cookieParser = require('cookie-parser');
+
+const auth = require('../middlewares/auth');
 
 
 module.exports = (app) => {
@@ -13,5 +16,8 @@ module.exports = (app) => {
     app.use('/static', express.static('static'))//use kazva na na6eto prilojenie da izpolzva nqkakuv middleware i middlewara koito 6te izpolzvame e express.static, na koito podavame putq na vsi4ki stati4ni failove v na6eto prilojenie , koito 6te e 'static'
     app.use('/js', express.static('js'))//i ot static i ot js 6te se zarejdat stati4ni failove
     app.use(express.urlencoded({ extended: false }))
+    app.use(cookieParser());
+    
+    app.use(auth());
 }
 
