@@ -1,6 +1,5 @@
 {{! v main 4asta slagane body v 3 mustazi  i ostavqme taka 4asta koqto e nepromenliva za vsi4ki stranici}}
 
-
 <html lang="en">
 
   <head>
@@ -20,23 +19,27 @@
         <ul>
           <li><img class="logo" src="/static/images/logo.png" /></li>
           <li><a href="/">Browse</a></li>
-           <li><a href="/about">About</a></li>
-           {{#if user}}
-          <li><a href="/products/create">Add a Cube</a></li>
-          <li><a href="/accessory/create">Add an Accessory</a></li>
-         
-          <li><a href="/auth/logout">Logout</a></li>
+          <li><a href="/about">About</a></li>
+          {{#if user}}
+            <li><a href="/products/create">Add a Cube</a></li>
+            <li><a href="/accessory/create">Add an Accessory</a></li>
+
+            <li><a href="/auth/logout">Logout</a></li>
           {{else}}
-          <li><a href="/auth/register">Register</a></li>
-          <li><a href="/auth/login">Login</a></li>
+            <li><a href="/auth/register">Register</a></li>
+            <li><a href="/auth/login">Login</a></li>
           {{/if}}
 
         </ul>
       </header>
       <main>
 
-        {{#if error}}
-          <span class="error">{{error}}</span>
+        {{#if errors}}
+          <span class="error">
+            {{#each errors}}
+              <p>{{this}}</p>
+            {{/each}}
+          </span>
         {{/if}}
         {{{body}}}
       </main>
