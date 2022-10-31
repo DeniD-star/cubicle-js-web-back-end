@@ -1,4 +1,6 @@
 const {Router} = require('express');
+const { isAuth , isOwner} = require('../middlewares/guards');
+const { preloadCube } = require('../middlewares/preload');
 
 const router = Router();
 
@@ -18,19 +20,21 @@ router.get('/', async(req, res)=>{
     res.render('index', ctx);
 });
 
-router.get('/create', (req, res) => {
+router.get('/create', isAuth(), (req, res) => {
     res.render('create', { title: 'Create Cube Page' });
     //render idva ot express, toi e koito tursi view s raz6irenie hbs, koeto da renderira
     //vsi4ki view-ta trqbva da sa vuv views papkata, ina4e imeto na pakata moje da se promeni
 });
 
-router.post('/create',  async(req, res) => {
+router.post('/create', isAuth(), async(req, res) => {
 
     const cube = {
         name: req.body.name,
         description: req.body.description,
         imageUrl: req.body.imageUrl,
-        difficultyLevel: Number(req.body.difficultyLevel)
+        difficultyLevel: Number(req.body.difficultyLevel),
+        creator: req.user._id
+       
     }
    try {
     await req.storage.create(cube);
@@ -43,15 +47,17 @@ router.post('/create',  async(req, res) => {
 });
 
 
-router.get('/details/:id',  async(req, res)=>{
+router.get('/details/:id', preloadCube(), async(req, res)=>{
 
-    const cube =  await req.storage.getById(req.params.id);
+    const cube =  req.data.cube;
    
 
     if(cube == undefined){
         res.redirect('/404');
 
     }else{
+
+        cube.isOwner = req.user && (req.user._id == cube.creatorId);
         const ctx = {
             title: 'Details Page',
             cube
@@ -62,13 +68,14 @@ router.get('/details/:id',  async(req, res)=>{
     
 });
 
-router.get('/edit/:id',  async(req, res) => {
-    const cube =  await req.storage.getById(req.params.id);
-    cube[`select${cube.difficultyLevel}`] = true;
+router.get('/edit/:id', preloadCube(), isOwner(),async(req, res) => {
+    const cube =  req.data.cube;
+   
     if(!cube){
         res.redirect('/404');
 
     }else{
+        cube[`select${cube.difficultyLevel}`] = true;
         const ctx = {
             title: 'Edit Cube Page',
             cube
@@ -80,7 +87,7 @@ router.get('/edit/:id',  async(req, res) => {
     
 });
 
-router.post('/edit/:id', async(req, res) => {
+router.post('/edit/:id', preloadCube(), isOwner(), async(req, res) => {
 
     const cube = {
         name: req.body.name,
