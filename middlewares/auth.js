@@ -15,15 +15,20 @@ module.exports = () => (req, res, next) => {//poneje ima convenciq che middlewar
     }
 
 
-    async function register({ username, password, repeatPassword }) {
+    async function register({ username, password }) {
         //validaciq
         //userDatata idva ot formulqra
 
+//tazi validaciq q mestq v authControllera, t.e predi da stigne v bazata danni da se pravi validaciq
+        // if (username == '' || password == '' || repeatPassword == '') {
+        //     throw new Error('All fields are required!')
+        // } else if (password != repeatPassword) {
+        //     throw new Error('Passwords don`t match!')
+        // }
 
-        if (username == '' || password == '' || repeatPassword == '') {
-            throw new Error('All fields are required!')
-        } else if (password != repeatPassword) {
-            throw new Error('Passwords don`t match!')
+        const existing = await userService.getUserByUsername(username);
+        if(existing){
+            throw new Error('Username is taken!')
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);

@@ -4,7 +4,8 @@ module.exports = (app) =>{
     return new Promise((resolve, reject)=> {
         mongoose.connect('mongodb://localhost:27017/cubicleTwo', {
             useNewUrlParser: true, 
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+         //useCreatedIndex is no longer supported
         })
 
         const db = mongoose.connection;

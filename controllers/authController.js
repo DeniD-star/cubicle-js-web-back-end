@@ -15,27 +15,34 @@ router.get('/register', isGuest(), (req, res) => {
 router.post('/register',
 isGuest(), //validaciqta q pravim sled proverkata na guardovete
 
-body('username', 'Username must be at least 3 characters long!')
+body('username', 'Username is required!')
 .trim()
-.isLength({min: 3})
+.isLength({min: 5}).withMessage('Username must be at least 5 characters long!')
 .custom( async (value, {req})=>{//ako go imame zaku4eno v req, mojem da vzemem funkziqta i ot tuk(getUserByUsername)
     const user = await getUserByUsername(value);
     if(user){
         throw new Error('User already exists!')//zaduljitelno trqbva da trounem gre6ka ,koeto defacto e rejectvaneto 6tom imame async validator. Return false izpulnqva, full-filva promisa. trqbva da hvurlim gre6ka.
     }
     return true;
-}),
-body('email', 'Please enter a valid email!').isEmail().normalizeEmail(), 
-body('password', 'All fields are required!').trim().notEmpty(), 
-body('repeatPassword', 'All fields are required!').trim().notEmpty(), 
+})
+.isAlphanumeric().withMessage('Username must be only alphanumeric characters!'),
+body('email', 'Please enter a valid email!').trim().isEmail().normalizeEmail(), 
+body('password', 'Password is required!').trim().isLength({min: 8}).withMessage('Password must be at least 8 characters long!').isAlphanumeric().withMessage('Password must be only alphanumeric characters!'), 
+body('repeatPassword', 'All fields are required!').trim().notEmpty().custom((value, {req})=>{
+        if(value != req.body.password){
+            throw new Error ('Passwords don`t match!')
+        }
+
+        return true;
+}), 
 async (req, res) => {//tova avtomati4no stava async function, tui kato, za6toto realno userServica vru6ta asynxronna finkziq i zatova imame try/catch, poneje po vreme na izvikvaneto i moje da izleze nqkakva gre6ka na survura, ina4e node.js 6te ni se kara ako nqmame try/catch
     try {
-            const {errors} = validationResult(req);
+            const errors = Object.values(validationResult(req).mapped());
             if(errors.length > 0){
                 throw new Error(errors.map(e=> e.msg).join('\n'))//da ni pokazva vsi4ki gre6ki navednuj
             }
      
-        // await req.auth.register(req.body);
+        await req.auth.register(req.body);
         res.redirect('/products')
         console.log(req.body.email);
     } catch (err) {
