@@ -32,15 +32,17 @@
 
         </ul>
       </header>
+      {{#if errors}}
+        <div id="notifications">
+
+          {{#each errors}}
+            <p>{{this}}</p>
+          {{/each}}
+
+        </div>
+      {{/if}}
       <main>
 
-        {{#if errors}}
-          <span class="error">
-            {{#each errors}}
-              <p>{{this}}</p>
-            {{/each}}
-          </span>
-        {{/if}}
         {{{body}}}
       </main>
     </div>
