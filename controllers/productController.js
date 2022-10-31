@@ -1,6 +1,10 @@
 const {Router} = require('express');
+const {body, validationResult} = require('express-validator');
 const { isAuth , isOwner} = require('../middlewares/guards');
 const { preloadCube } = require('../middlewares/preload');
+
+//sanitizers promenqt req, promenqt sudurjanieto, taka 4e da go napravqt validno(dopulvat validaciqta)
+//custom validation sa funkciite koito da vurnat true ili false, custom priema edna funkziq koqto vru6ta true ili false. kato tazi funkciq moje da e asynhronna/Priema parametar value, koeto value e vsu6tnost tova koeto sme slojili za pole za proverka
 
 const router = Router();
 
@@ -26,18 +30,26 @@ router.get('/create', isAuth(), (req, res) => {
     //vsi4ki view-ta trqbva da sa vuv views papkata, ina4e imeto na pakata moje da se promeni
 });
 
-router.post('/create', isAuth(), async(req, res) => {
+router.post('/create',
+ isAuth(),  //validaciqta q pravim sled proverkata na guardovete
+//  body('imageUrl', 'Image must be a valid Url!').isURL(),
+ body('difficultyLevel', 'Difficulty level must be a number!').notEmpty().toInt(),
+ async(req, res) => {
 
     const cube = {
         name: req.body.name,
         description: req.body.description,
         imageUrl: req.body.imageUrl,
-        difficultyLevel: Number(req.body.difficultyLevel),
+        difficultyLevel: req.body.difficultyLevel,
         creator: req.user._id
        
     }
+
+    console.log(cube);
+    const {errors} = validationResult(req);
+    console.log(errors);
    try {
-    await req.storage.create(cube);
+    // await req.storage.create(cube);
    } catch (err) {
       if(err.name == 'ValidationError'){
           return res.render('create', {title: 'Create Cube Page', error: 'All fields are required. Image url must be a valid Url!'})
