@@ -31,7 +31,10 @@ async function getById(id) {
     //tuk ne e nujna validaciq , tui kato ako imame undefined, ve4e samiq controller 6te prenaso4i kum 404
     const cube = await Cube
         .findById(id)
-        .populate('comments')
+        .populate({
+            path: 'comments',
+            populate: {path: 'author'}
+        })
         .populate('accessories')
         .populate('creator')
         .lean();
@@ -42,7 +45,7 @@ async function getById(id) {
             description: cube.description,
             imageUrl: cube.imageUrl,
             difficultyLevel: cube.difficultyLevel,
-            comments: cube.comments,
+            comments: cube.comments.map(c=>({content: c.content, author: c.author.username})),
             accessories: cube.accessories,
             creator: cube.creator?.username,
            //creator: cube.creator && cube.creator.username

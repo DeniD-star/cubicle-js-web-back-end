@@ -1,15 +1,15 @@
 module.exports = {
     commentPost: async(req, res)=>{
-       
+       const authorId = req.user._id;
         const cubeId = req.params.cubeId;
         console.log(cubeId)
         const comment = {
-            author: req.body.author,
+            author: authorId,
             content: req.body.content
         }
 
         await req.storage.createComment(cubeId, comment);
-        res.redirect(`/details/${cubeId}`)
+        res.redirect(`/products/details/${cubeId}`)
     }
 
 
