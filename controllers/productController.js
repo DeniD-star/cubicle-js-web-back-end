@@ -32,7 +32,7 @@ router.get('/create', isAuth(), (req, res) => {
 
 router.post('/create',
  isAuth(),  //validaciqta q pravim sled proverkata na guardovete
-//  body('imageUrl', 'Image must be a valid Url!').isURL(),
+//  body('imageUrl', 'Image must be a valid Url!').isURL(), //express-validator
  body('difficultyLevel', 'Difficulty level must be a number!').notEmpty().toInt(),
  async(req, res) => {
 
@@ -49,10 +49,12 @@ router.post('/create',
     const {errors} = validationResult(req);
     console.log(errors);
    try {
-    // await req.storage.create(cube);
+     await req.storage.create(cube);
    } catch (err) {
+       const errors = Object.values(err.errors).map(e=> e.properties.message);
+       console.log(errors);
       if(err.name == 'ValidationError'){
-          return res.render('create', {title: 'Create Cube Page', error: 'All fields are required. Image url must be a valid Url!'})
+          return res.render('create', {title: 'Create Cube Page', error: 'All fields are required. Image url must be a valid Url!', errors})
       }
    }
     res.redirect('/');
